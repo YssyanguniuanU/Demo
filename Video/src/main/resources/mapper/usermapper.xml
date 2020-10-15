@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.yssy.dao.UserDao">
+
+	<cache type="com.yssy.redis.RedisCache"/>
+
+	<insert id="add" parameterType="User">
+		insert into user values(null,#{email},#{phoneNum},MD5(#{password}),#{code},
+		#{nickname},#{sex},#{birthday},'暂无-暂无','imgs/defult.jpg',now())
+	</insert>
+
+	<update id="update" parameterType="User">
+		update user
+		<trim prefix="set" prefixOverrides=",">
+			<if test="email!=null">email=#{email}</if>
+			<if test="phoneNum!=null"> ,phoneNum=#{phoneNum}</if>
+			<if test="password!=null"> ,password=MD5(#{password})</if>
+			<if test="code!=null"> ,code=#{code}</if>
+			<if test="nickname!=null"> ,nickname=#{nickname}</if>
+			<if test="sex!=null"> ,sex=#{sex}</if>
+			<if test="birthday!=null"> ,birthday=#{birthday}</if>
+			<if test="address!=null"> ,address=#{address}</if>
+			<if test="imgUrl!=null"> ,imgUrl=#{imgUrl}</if>	
+		</trim>
+		where user_id = #{userId}
+	</update>
+
+	<delete id="delete" parameterType="int">
+		delete from user where user_id = #{userId}
+	</delete>
+
+	<resultMap type="user" id="userMap">
+		<id column="user_id" property="userId"/>
+		<result column="email" property="email"/>
+		<result column="phoneNum" property="phoneNum"/>
+		<result column="password" property="password"/>
+		<result column="code" property="code"/>
+		<result column="nickname" property="nickname"/>
+		<result column="sex" property="sex"/>
+		<result column="birthday" property="birthday"/>
+		<result column="address" property="address"/>
+		<result column="imgUrl" property="imgUrl"/>
+	</resultMap>
+
+	<select id="selectAll" resultMap="userMap">
+		select * from user 
+		<trim prefix="where" prefixOverrides="and">
+			<if test="userId!=null">user_id = #{userId}</if>
+			<if test="email!=null">and email=#{email}</if>
+			<if test="phoneNum!=null">and phoneNum=#{phoneNum}</if>
+			<if test="password!=null">and password=MD5(#{password})</if>
+			<if test="code!=null">and code=#{code}</if>
+			<if test="nickname!=null">and nickname=#{nickname}</if>
+			<if test="sex!=null">and sex=#{sex}</if>
+			<if test="birthday!=null">and birthday=#{birthday}</if>
+			<if test="address!=null">and address=#{address}</if>
+			<if test="imgUrl!=null">and imgUrl=#{imgUrl}</if>	
+		</trim>
+	</select>
+
+</mapper>

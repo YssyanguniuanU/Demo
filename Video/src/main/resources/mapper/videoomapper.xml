@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.yssy.dao.VideooDao">
+	
+	<cache type="com.yssy.redis.RedisCache"/>
+	
+	<!-- 添加视频的方法 -->
+	<insert parameterType="videoo" id="add">
+		insert into video values(null,#{title},#{detail},#{time},#{speakerId},#{courseId},#{videoUrl},#{imageUrl},0) 
+	</insert>
+	
+	<!-- 通过id删除 -->
+	<delete id="deleteAll">
+		delete from video where video_id in
+		<foreach collection="array" item="videooId" separator="," open="(" close=")">
+		#{videooId}
+		</foreach>
+	</delete>
+	
+	<!-- 更新课程 -->
+	<update parameterType="videoo" id="update">
+		update video
+		<trim prefixOverrides="," prefix="set">
+			<if test="title!=null"> title=#{title} </if>
+			<if test="detail!=null"> , detail=#{detail}</if>
+			<if test="time!=null"> , time=#{time}</if>
+			<if test="speakerId!=null"> , speaker_id=#{speakerId}</if>
+			<if test="courseId!=null"> , course_id=#{courseId}</if>
+			<if test="videoUrl!=null"> , video_url=#{videoUrl}</if>
+			<if test="imageUrl!=null"> , image_url=#{imageUrl}</if>
+			<if test="playNum!=null"> , play_num=#{playNum}</if>
+		</trim>
+		where video_id = #{videooId} 
+	</update>
+	
+	<!-- 设置映射 -->
+	<resultMap id="videooMap" type="videoo">
+		<id property="videooId" column="video_id"/>
+		<result property="title" column="title"/>
+		<result property="detail" column="detail"/>
+		<result property="time" column="time"/>
+		<result property="speakerId" column="speaker_id"/>
+		<result property="courseId" column="course_id"/>
+		<result property="videoUrl" column="video_url"/>
+		<result property="imageUrl" column="image_url"/>
+		<result property="playNum" column="play_num"/>
+		<!-- 用来指定speaker对象 -->
+		<association property="speaker" javaType="com.yssy.model.Speaker">
+			<id column="speaker_id" property="speakerId"/>
+			<result column="speaker_name" property="speakerName"/>
+			<result column="speaker_desc" property="speakerDesc"/>
+			<result column="speaker_job" property="speakerJob"/>
+			<result column="head_img_url" property="headImgUrl"/>
+		</association>
+		<!-- 用来指定course对象 -->
+		<association property="course" javaType="com.yssy.model.Course">
+			<id property="courseId" column="course_id"/>
+			<result property="courseTitle" column="course_title"/>
+			<result property="courseDesc" column="course_desc"/>
+			<result property="subjectId" column="subject_id"/>
+			<!-- 用来指定subject对象 -->
+			<association property="subject" javaType="com.yssy.model.Subject">
+				<id column="subject_id" property="subjectId"/>
+				<result column="subject_name" property="subjectName"/>
+			</association>
+		</association>
+	</resultMap>
+	
+	<!-- 查询全部 -->
+	<select id="selectAll" resultMap="videooMap">
+		SELECT * FROM video v,course c,speaker s WHERE v.course_id=c.course_id AND v.speaker_id=s.speaker_id
+		<if test="videooId!=null">and v.video_id=#{videooId}</if>
+		<if test="courseId!=null">and v.course_id=#{courseId}</if>
+	</select>
+	
+	
+	<!-- 动态模糊查询 -->
+	<select id="selectLikeAll" resultMap="videooMap"> 
+		SELECT * FROM video v,course c,speaker s WHERE v.course_id=c.course_id AND v.speaker_id=s.speaker_id
+		<if test="title!=null">
+			and v.title = #{title}
+		</if>
+		<if test="speakerId!=null">
+			and v.speaker_id = #{speakerId}
+		</if>
+		<if test="courseId!=null">
+			and v.course_id = #{courseId}
+		</if>
+	</select>
+</mapper>

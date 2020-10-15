@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.yssy.dao.AdminDao">
+	
+	<cache type="com.yssy.redis.RedisCache"/>
+	
+	<resultMap type="admin" id="adminMap">
+		<id column="admin_id" property="adminId"/>
+		<result column="username" property="username"/>
+		<result column="password" property="password"/>
+		<result column="roles" property="roles"/>
+	</resultMap>
+	
+	<select id="selectAll" resultMap="adminMap">
+		select * from admin
+		<trim prefix="where" prefixOverrides="and">
+			<if test="adminId!=null"> admin_id = #{adminId} </if>
+			<if test="username!=null"> and username = #{username} </if>
+			<if test="password!=null"> and password = MD5(#{password}) </if>
+			<if test="roles!=null"> and roles = #{roles} </if>
+		</trim>
+	</select>
+	
+	<select id="selectLikeAll" resultMap="adminMap">
+		select * from admin
+		<trim prefix="where" prefixOverrides="and">
+			<if test="adminId!=null"> 
+				<bind name="adminIds" value="'%'+adminId+'%'"/>
+				admin_id like #{adminIds} 
+			</if>
+			<if test="username!=null">
+				<bind name="usernames" value="'%'+username+'%'"/>
+				and username like #{usernames}
+			</if>
+			<if test="password!=null">
+				<bind name="passwords" value="'%'+password+'%'"/>
+				and password like #{passwords}
+			</if>
+			<if test="roles!=null">
+				<bind name="roless" value="'%'+roles+'%'"/>
+				and roles like #{roless}
+			</if>
+		</trim>
+	</select>
+	
+</mapper>

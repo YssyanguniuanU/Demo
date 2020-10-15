@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.yssy.dao.SpeakerDao">
+	
+	<cache type="com.yssy.redis.RedisCache"/>
+	
+	<!-- 添加主讲人的方法 -->
+	<insert parameterType="speaker" id="add">
+		insert into speaker values(null,#{speakerName},#{speakerDesc},#{speakerJob},#{headImgUrl}) 
+	</insert>
+	
+	<!-- 通过id删除 -->
+	<delete id="deleteAll">
+		delete from speaker where speaker_id in
+		<foreach collection="array" item="speakerId" separator="," open="(" close=")">
+		#{speakerId}
+		</foreach>
+	</delete>
+	
+	<!-- 更新课程 -->
+	<update parameterType="speaker" id="update">
+		update speaker
+		<trim prefixOverrides="," prefix="set">
+			<if test="speakerName!=null"> speaker_name=#{speakerName} </if>
+			<if test="speakerDesc!=null"> , speaker_desc=#{speakerDesc}</if>
+			<if test="speakerJob!=null"> , speaker_job=#{speakerJob}</if>
+			<if test="headImgUrl!=null"> , head_img_url=#{headImgUrl}</if>
+		</trim>
+		where speaker_id = #{speakerId} 
+	</update>
+	
+	<!-- 设置映射 -->
+	<resultMap id="speakerMap" type="speaker">
+		<id property="speakerId" column="speaker_id"/>
+		<result property="speakerName" column="speaker_name"/>
+		<result property="speakerDesc" column="speaker_desc"/>
+		<result property="speakerJob" column="speaker_job"/>
+		<result property="headImgUrl" column="head_img_url"/>
+	</resultMap>
+	
+	<!-- 查询全部 -->
+	<select id="selectAll" resultMap="speakerMap">
+		select * from speaker 
+		<where>
+			<if test="speakerId!=null">speaker_id=#{speakerId}</if>
+			<if test="speakerName!=null">and speaker_name=#{speakerName} </if>
+			<if test="speakerDesc!=null">and speaker_desc=#{speakerDesc}</if>
+			<if test="speakerJob!=null">and speaker_job=#{speakerJob}</if>
+			<if test="headImgUrl!=null">and head_img_url=#{headImgUrl}</if>
+		</where>
+		
+	</select>
+	
+	
+	<!-- 动态模糊查询 -->
+	<select id="selectLikeAll" resultMap="speakerMap"> 
+		select * from speaker
+		<trim prefix="where" prefixOverrides="and">
+			<if test="speakerId!=null">
+				<bind name="speakerId" value="'%'+speakerId+'%'"/>
+				and speaker_id like #{speakerId}
+			</if>
+			<if test="speakerName!=null">
+				<bind name="speakerName" value="'%'+speakerName+'%'"/>
+				and speaker_name like #{speakerName}
+			</if>
+			<if test="speakerDesc!=null">
+				<bind name="speakerDesc" value="'%'+speakerDesc+'%'"/>
+				and speaker_desc like #{speakerDesc}
+			</if>
+			<if test="speakerJob!=null">
+				<bind name="speakerJob" value="'%'+speakerJob+'%'"/>
+				and speaker_job like #{speakerJob}
+			</if>
+		</trim>
+		
+	</select>
+</mapper>

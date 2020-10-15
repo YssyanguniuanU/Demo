@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.yssy.dao.SubjectDao">
+
+	<cache type="com.yssy.redis.RedisCache"/>
+
+	<resultMap type="subject" id="subjectMap">
+		<id column="subject_id" property="subjectId"/>
+		<id column="subject_name" property="subjectName"/>
+		<collection property="courseList" ofType="com.yssy.model.Course">
+			<id property="courseId" column="course_id"/>
+			<result property="courseTitle" column="course_title"/>
+			<result property="courseDesc" column="course_desc"/>
+			<result property="subjectId" column="subject_id"/>
+			<!-- 用来指定集合 -->
+			<collection property="videooList" ofType="com.yssy.model.Videoo">
+				<id property="videooId" column="video_id"/>
+				<result property="title" column="title"/>
+				<result property="detail" column="detail"/>
+				<result property="time" column="time"/>
+				<result property="speakerId" column="speaker_id"/>
+				<result property="courseId" column="course_id"/>
+				<result property="videoUrl" column="video_url"/>
+				<result property="imageUrl" column="image_url"/>
+				<result property="playNum" column="play_num"/>
+			</collection>
+		</collection>
+	</resultMap>
+
+	<select id="selectAll" resultMap="subjectMap">
+		select * from subject
+		<trim prefix="where" prefixOverrides="and">
+			<if test="subjectId!=null">
+				subject_id=#{subjectId}
+			</if>
+		</trim>
+	</select>
+	
+	<select id="selectCourseAndVideo" resultMap="subjectMap">
+		SELECT *  FROM  subject s, (select c.course_title,c.course_desc,c.subject_id,v.* 
+			from course c LEFT JOIN video v ON c.course_id = v.course_id) z 
+		WHERE s.subject_id=z.subject_id AND s.subject_id=#{sujectId}
+	</select>
+	
+</mapper>

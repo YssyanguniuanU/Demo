@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!-- 开启二级缓存 -->
+	<settings>
+		<setting name="lazyLoadingEnabled" value="true"/>
+		<setting name="cacheEnabled" value="true"/>
+	</settings>
+
+	<!-- 起别名 -->
+	<typeAliases>
+		<typeAlias type="com.yssy.model.Admin" alias="admin"/>
+		<typeAlias type="com.yssy.model.Course" alias="course"/>
+		<typeAlias type="com.yssy.model.Subject" alias="subject"/>
+		<typeAlias type="com.yssy.model.User" alias="user"/>
+		<typeAlias type="com.yssy.model.Speaker" alias="speaker"/>
+		<typeAlias type="com.yssy.model.Videoo" alias="videoo"/>
+	</typeAliases>
+	
+	<!-- 分页插件 -->
+	<plugins>
+		<plugin interceptor="com.github.pagehelper.PageInterceptor"></plugin>
+	</plugins>
+</configuration>
