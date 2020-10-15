@@ -14,7 +14,7 @@ import com.yssy.service.AdminService;
 public class AdminController {
 	@Autowired
 	AdminService service;
-	
+	 
 	@RequestMapping("adminLogin") 
 	public String adminLogin(String username,String password,HttpServletRequest req, HttpServletResponse resp) {
 		Admin admin = service.selectByName(username, password);
